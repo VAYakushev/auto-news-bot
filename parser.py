@@ -67,7 +67,7 @@ def get_article_content(url: str) -> Dict:
             text_parts = []
             for p in paragraphs[:15]:
                 text = p.get_text(strip=True)
-                if len(text) > 50 and not text.startswith("Р§РёС‚Р°Р№С‚Рµ С‚Р°РєР¶Рµ"):
+                if len(text) > 50 and not text.startswith("Читайте также"):
                     text_parts.append(text)
                 if len(" ".join(text_parts)) > 600:
                     break
@@ -264,11 +264,11 @@ def enrich_news(news: List[Dict], limit: int = 10) -> List[Dict]:
 
 def score_news(news: List[Dict]) -> List[Dict]:
     keywords_positive = [
-        "РїСЂРµРјСЊРµСЂР°", "РЅРѕРІС‹Р№", "Р·Р°РїСѓСЃРє", "С‚РµСЃС‚-РґСЂР°Р№РІ", "РѕР±Р·РѕСЂ", "СЂС‹РЅРѕРє", 
-        "РїСЂРѕРґР°Р¶Рё", "С†РµРЅР°", "СЌР»РµРєС‚СЂРѕ", "РіРёР±СЂРёРґ", "СЂРѕСЃСЃРёСЏ", "РєРёС‚Р°Р№",
-        "С‚РµСЃС‚", "СЃСЂР°РІРЅРµРЅРёРµ", "СЂРµР№С‚РёРЅРі", "РїРѕР±РµРґРёР»", "СѓРЅРёРєР°Р»СЊРЅС‹Р№"
+        "премьера", "новый", "запуск", "тест-драйв", "обзор", "рынок", 
+        "продажи", "цена", "электро", "гибрид", "россия", "китай",
+        "тест", "сравнение", "рейтинг", "победил", "уникальный"
     ]
-    keywords_negative = ["СЂРµРєР»Р°РјР°", "РїСЂРѕРјРѕ", "СЃРєРёРґРєР°", "Р°РєС†РёСЏ", "РєСѓРїРёС‚СЊ"]
+    keywords_negative = ["реклама", "промо", "скидка", "акция", "купить"]
     
     scored = []
     for item in news:
