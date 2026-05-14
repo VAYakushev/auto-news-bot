@@ -5,8 +5,9 @@ import time
 import requests
 import re
 from io import BytesIO
+import html
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, encoding='utf-8')
 logger = logging.getLogger(__name__)
 
 if PROXY:
@@ -71,9 +72,9 @@ def highlight_key_facts(description: str) -> str:
 
 
 def format_single_news(news_item: dict) -> str:
-    title = news_item.get("title", "Р‘РµР· РЅР°Р·РІР°РЅРёСЏ")
-    description = news_item.get("description", "")
-    source = news_item.get("source", "")
+    title = html.unescape(news_item.get("title", "Р‘РµР· РЅР°Р·РІР°РЅРёСЏ"))
+    description = html.unescape(news_item.get("description", ""))
+    source = html.unescape(news_item.get("source", ""))
     url = news_item.get("url", "")
     
     text = highlight_key_facts(description)
