@@ -37,10 +37,9 @@ def download_image(url: str) -> bytes | None:
                 "Accept": "image/webp,image/apng,image/*,*/*"
             })
             if resp.status_code == 200 and len(resp.content) > 15000:
-                logger.info(f"Image: {img_url[:60]}... ({len(resp.content)} bytes)")
                 return resp.content
-        except Exception as e:
-            logger.warning(f"Download failed: {img_url[:40]}")
+        except Exception:
+            pass
     
     return None
 
@@ -91,17 +90,14 @@ def post_single_news(news_item: dict) -> bool:
         image_url = news_item.get("image", "")
         
         if not image_url or len(image_url) < 10:
-            logger.info(f"Skipped (no image): {news_item.get('title', '')[:50]}")
             return False
         
         img_data = download_image(image_url)
         if not img_data:
-            logger.info(f"Skipped (img download failed): {news_item.get('title', '')[:50]}")
             return False
         
         message = format_single_news(news_item)
         bot.send_photo(TELEGRAM_CHANNEL_ID, img_data, caption=message, parse_mode="Markdown")
-        logger.info(f"Posted with image: {news_item.get('title', '')[:50]}")
         
         time.sleep(5)
         return True
