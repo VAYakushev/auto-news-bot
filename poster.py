@@ -46,9 +46,9 @@ def download_image(url: str) -> bytes | None:
 
 def highlight_key_facts(description: str) -> str:
     positive_keywords = [
-        "РїСЂРµРјСЊРµСЂР°", "РІРїРµСЂРІС‹Рµ", "РЅРѕРІС‹Р№", "Р·Р°РїСѓСЃРє", "РґРµР±СЋС‚", "РїСЂРµРґСЃС‚Р°РІР»РµРЅ",
-        "СЌР»РµРєС‚СЂРѕ", "РіРёР±СЂРёРґ", "Р°РІС‚РѕРЅРѕРјРЅС‹Р№", "СЂРµРєРѕСЂРґ", "РїРѕР±РµРґРёР»", "СѓРЅРёРєР°Р»СЊРЅС‹Р№",
-        "РјРѕС‰РЅРѕСЃС‚СЊ", "Р·Р°РїР°СЃ С…РѕРґР°", "Р±С‹СЃС‚СЂР°СЏ Р·Р°СЂСЏРґРєР°", "Р±РµР·РѕРїР°СЃРЅРѕСЃС‚СЊ"
+        "премьера", "впервые", "новый", "запуск", "дебют", "представлен",
+        "электро", "гибрид", "автономный", "рекорд", "победил", "уникальный",
+        "мощность", "запас хода", "быстрая зарядка", "безопасность"
     ]
     
     sentences = description.split(".")
@@ -61,7 +61,7 @@ def highlight_key_facts(description: str) -> str:
             sent += "."
         for kw in positive_keywords:
             if kw.lower() in sent.lower():
-                highlighted.append(f"вњ… {sent}")
+                highlighted.append(f"✅ {sent}")
                 break
         else:
             if len(highlighted) < 3:
@@ -71,16 +71,16 @@ def highlight_key_facts(description: str) -> str:
 
 
 def format_single_news(news_item: dict) -> str:
-    title = html.unescape(news_item.get("title", "Р‘РµР· РЅР°Р·РІР°РЅРёСЏ"))
+    title = html.unescape(news_item.get("title", "Без названия"))
     description = html.unescape(news_item.get("description", ""))
     source = html.unescape(news_item.get("source", ""))
     url = news_item.get("url", "")
     
     text = highlight_key_facts(description)
     
-    msg = f"рџљ— *{title}*\n\n"
+    msg = f"🚗 *{title}*\n\n"
     msg += f"{text}\n\n"
-    msg += f"рџ“Ќ {source} | [РџРѕРґСЂРѕР±РЅРµРµ]({url})"
+    msg += f"📍 {source} | [Подробнее]({url})"
     
     return msg
 
