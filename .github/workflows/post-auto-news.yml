@@ -33,14 +33,10 @@ jobs:
 
       - name: Commit and push
         run: |
-          git config --local user.email bot@auto-news-bot
-          git config --local user.name Auto News Bot
-          if [ -f published_urls.txt ]; then
-            git add -f published_urls.txt
-            if git diff --cached --quiet; then
-              echo No changes
-            else
-              git commit -m Update published_urls.txt
-              git push || echo Push failed
-            fi
-          fi
+          git config --local user.email "bot@auto-news-bot"
+          git config --local user.name "Auto News Bot"
+          git add -f published_urls.txt
+          git status
+          git diff --cached
+          git commit -m "Update published_urls.txt" || echo "Nothing to commit"
+          git push || echo "Push failed"
