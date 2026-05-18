@@ -280,7 +280,7 @@ def enrich_news(news: List[Dict], limit: int = 8) -> List[Dict]:
 def score_news(news: List[Dict]) -> List[Dict]:
     keywords_positive = [
         "премьера", "новый", "запуск", "дебют", "представлен", "анонс",
-        "электро", "гибрид", "цена", "продажи", "россия", "китай",
+        "электро", "цена", "продажи", "россия", "китай",
         "тест", "сравнение", "рейтинг", "победил", "уникальный", "мощность"
     ]
     keywords_negative = ["реклама", "промо", "скидка", "акция", "купить", "рассрочка"]
@@ -306,11 +306,14 @@ def score_news(news: List[Dict]) -> List[Dict]:
             score += 1
         
         scored.append((score, item))
+        logger.info(f"Score {score}: {item.get('title', '')[:50]}")
     
     scored.sort(key=lambda x: x[0], reverse=True)
     
     top_score = scored[0][0] if scored else 0
-    top_items = [item for score, item in scored if score == top_score]
+    top_items = [item for score, item in scored if score >= top_score - 2]
     
     import random
-    return [random.choice(top_items)]
+    chosen = random.choice(top_items)
+    logger.info(f"Chosen: {chosen.get('title', '')[:50]}")
+    return [chosen]
