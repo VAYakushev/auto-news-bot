@@ -251,14 +251,17 @@ def fetch_all_news() -> List[Dict]:
     return all_news
 
 
-def enrich_news(news: List[Dict], limit: int = 10) -> List[Dict]:
+def enrich_news(news: List[Dict], limit: int = 5) -> List[Dict]:
     enriched = []
     for item in news[:limit]:
-        content = get_article_content(item["url"])
-        item.update(content)
-        if item.get("title") and item.get("description"):
-            enriched.append(item)
-        time.sleep(1)
+        try:
+            content = get_article_content(item["url"])
+            item.update(content)
+            if item.get("title") and item.get("description"):
+                enriched.append(item)
+            time.sleep(0.5)
+        except Exception as e:
+            logger.error(f"Enrich error: {e}")
     return enriched
 
 
