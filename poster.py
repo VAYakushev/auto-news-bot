@@ -20,23 +20,40 @@ bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 def download_image(url: str) -> bytes | None:
     urls_to_try = []
     
+    if not url or len(url) < 10:
+        return None
+    
     url_clean = re.sub(r'/\d+_\d+x\d+', '', url)
     url_clean = re.sub(r'[?&].*$', '', url_clean)
     
-    if "_top_pics" in url_clean or "/media/" in url_clean:
-        urls_to_try.append(url_clean.replace("/top_pics/", "/top_pics/media/").replace(".jpeg", "_1280x720.jpeg").replace(".jpg", "_1280x720.jpg").replace(".png", "_1280x720.png"))
-        urls_to_try.append(url_clean.replace("/top_pics/", "/top_pics/resize/").replace(".jpeg", "_1280.jpeg").replace(".jpg", "_1280.jpg").replace(".png", "_1280.png"))
+    if "_top_pics" in url_clean:
+        urls_to_try.append(url_clean.replace("/top_pics/", "/top_pics/media/"))
+        urls_to_try.append(url_clean.replace("/top_pics/", "/top_pics/resize/"))
+    
+    if ".drom.ru" in url_clean:
+        base = url_clean.replace(".drom.ru", "")
+        if "/i" not in base:
+            parts = base.split("/")
+            for i, p in enumerate(parts):
+                if p.isdigit():
+                    parts[i] = f"i{p}"
+                    urls_to_try.append("/".join(parts) + "/gen340_full.jpg")
+                    break
     
     urls_to_try.append(url_clean)
     urls_to_try.append(url)
     
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.google.com/"
+    }
+    
     for img_url in urls_to_try:
         try:
-            resp = requests.get(img_url, timeout=25, headers={
-                "User-Agent": "Mozilla/5.0",
-                "Accept": "image/webp,image/apng,image/*,*/*"
-            })
-            if resp.status_code == 200 and len(resp.content) > 15000:
+            resp = requests.get(img_url, timeout=15, headers=headers)
+            if resp.status_code == 200 and 5000 < len(resp.content) < 5000000:
                 return resp.content
         except Exception:
             pass
