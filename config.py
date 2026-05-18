@@ -18,7 +18,7 @@ SOURCES = [
     {"name": "kolesa", "url": "https://www.kolesa.ru/news/", "enabled": True},
 ]
 
-POST_INTERVAL_HOURS = 2
+POST_TIMES = ["10:00", "17:00"]  # MSK
 
 NEWS_PER_SESSION = 1
 
