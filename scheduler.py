@@ -5,9 +5,9 @@ from parser import fetch_all_news, enrich_news, score_news
 from filter import filter_new_news, deduplicate
 from poster import post_news_batch
 from db import mark_as_published
-from config import POST_INTERVAL_HOURS, NEWS_PER_SESSION
+from config import POST_TIMES, NEWS_PER_SESSION
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, encoding='utf-8')
 logger = logging.getLogger(__name__)
 
 
@@ -16,7 +16,7 @@ def job():
     
     raw_news = fetch_all_news()
     raw_news = deduplicate(raw_news)
-    raw_news = filter_new_news(raw_news)
+    raw_news = filter_new_news(news)
     
     if not raw_news:
         logger.info("Новых новостей не найдено")
@@ -40,9 +40,10 @@ def job():
 
 
 def run_scheduler():
-    schedule.every(POST_INTERVAL_HOURS).hours.do(job)
+    for time_str in POST_TIMES:
+        schedule.every().day.at(time_str).do(job)
     
-    logger.info(f"Планировщик настроен: каждые {POST_INTERVAL_HOURS} часа")
+    logger.info(f"Планировщик настроен на {POST_TIMES}")
     job()
     
     while True:
