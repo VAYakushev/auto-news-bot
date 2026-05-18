@@ -279,11 +279,11 @@ def enrich_news(news: List[Dict], limit: int = 8) -> List[Dict]:
 
 def score_news(news: List[Dict]) -> List[Dict]:
     keywords_positive = [
-        "премьера", "новый", "запуск", "тест-драйв", "обзор", "рынок", 
-        "продажи", "цена", "электро", "гибрид", "россия", "китай",
-        "тест", "сравнение", "рейтинг", "победил", "уникальный"
+        "премьера", "новый", "запуск", "дебют", "представлен", "анонс",
+        "электро", "гибрид", "цена", "продажи", "россия", "китай",
+        "тест", "сравнение", "рейтинг", "победил", "уникальный", "мощность"
     ]
-    keywords_negative = ["реклама", "промо", "скидка", "акция", "купить"]
+    keywords_negative = ["реклама", "промо", "скидка", "акция", "купить", "рассрочка"]
     
     scored = []
     for item in news:
@@ -292,20 +292,25 @@ def score_news(news: List[Dict]) -> List[Dict]:
         
         for kw in keywords_positive:
             if kw in text:
-                score += 2
+                score += 3
         
         for kw in keywords_negative:
             if kw in text:
-                score -= 1
+                score -= 2
         
         if item.get("image"):
-            score += 1
+            score += 2
         
         title_len = len(item.get("title", ""))
-        if 30 < title_len < 150:
+        if 30 < title_len < 120:
             score += 1
         
         scored.append((score, item))
     
     scored.sort(key=lambda x: x[0], reverse=True)
-    return [item for _, item in scored]
+    
+    top_score = scored[0][0] if scored else 0
+    top_items = [item for score, item in scored if score == top_score]
+    
+    import random
+    return [random.choice(top_items)]
