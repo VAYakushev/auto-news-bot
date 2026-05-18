@@ -243,7 +243,7 @@ def parse_kolesa() -> List[Dict]:
 
 def fetch_all_news() -> List[Dict]:
     all_news = []
-    for parser in [parse_iz_volkswagen, parse_drom, parse_autopilot, parse_motor, parse_drive, parse_kolesa]:
+    for parser in [parse_drom, parse_motor, parse_drive, parse_kolesa]:
         try:
             all_news.extend(parser())
         except Exception as e:
