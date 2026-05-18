@@ -88,20 +88,18 @@ def format_single_news(news_item: dict) -> str:
 def post_single_news(news_item: dict) -> bool:
     try:
         image_url = news_item.get("image", "")
-        
-        if not image_url or len(image_url) < 10:
-            logger.info(f"Skipped (no image): {news_item.get('title', '')[:50]}")
-            return False
-        
-        img_data = download_image(image_url)
-        if not img_data:
-            logger.info(f"Skipped (img fail): {news_item.get('title', '')[:50]}")
-            return False
-        
         message = format_single_news(news_item)
-        bot.send_photo(TELEGRAM_CHANNEL_ID, img_data, caption=message, parse_mode="Markdown")
-        logger.info(f"Posted: {news_item.get('title', '')[:50]}")
         
+        if image_url and len(image_url) > 10:
+            img_data = download_image(image_url)
+            if img_data:
+                bot.send_photo(TELEGRAM_CHANNEL_ID, img_data, caption=message, parse_mode="Markdown")
+                logger.info(f"Posted with image: {news_item.get('title', '')[:50]}")
+                time.sleep(3)
+                return True
+        
+        bot.send_message(TELEGRAM_CHANNEL_ID, message, parse_mode="Markdown")
+        logger.info(f"Posted text: {news_item.get('title', '')[:50]}")
         time.sleep(3)
         return True
     
