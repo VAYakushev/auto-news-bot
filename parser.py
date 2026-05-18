@@ -38,9 +38,21 @@ def get_article_content(url: str) -> Dict:
         
         image = None
         
-        og_image = soup.find("meta", property="og:image")
-        if og_image:
-            image = og_image.get("content", "")
+        article_body = soup.find("article") or soup.find("div", class_=lambda x: x and ("content" in str(x).lower() or "text" in str(x).lower()))
+        
+        if article_body:
+            imgs = article_body.find_all("img")
+            for img in imgs:
+                src = img.get("src") or img.get("data-src") or img.get("data-lazy") or ""
+                if src and len(src) > 20 and "logo" not in src.lower() and "icon" not in src.lower():
+                    if ".jpg" in src.lower() or ".jpeg" in src.lower() or ".png" in src.lower() or ".webp" in src.lower():
+                        image = src
+                        break
+        
+        if not image:
+            og_image = soup.find("meta", property="og:image")
+            if og_image:
+                image = og_image.get("content", "")
         
         if not image:
             picture = soup.find("picture")
@@ -48,15 +60,15 @@ def get_article_content(url: str) -> Dict:
                 source = picture.find("source")
                 if source:
                     image = source.get("srcset", "").split()[0] if source.get("srcset") else ""
-            
+        
         if not image:
-            img = soup.find("img", {"class": lambda x: x and "photo" in str(x).lower()})
-            if not img:
-                img = soup.find("img", {"data-src": lambda x: x and ("/photo" in str(x) or "/news" in str(x))})
-            if not img:
-                img = soup.find("img", {"width": lambda x: x and int(x or 0) > 400})
-            if img:
-                image = img.get("data-src") or img.get("src", "")
+            imgs = soup.find_all("img")
+            for img in imgs:
+                src = img.get("src") or img.get("data-src") or ""
+                if src and len(src) > 50 and ("/photo" in src or "/news" in src or "/upload" in src):
+                    if "logo" not in src.lower() and "icon" not in src.lower():
+                        image = src
+                        break
         
         description = soup.find("meta", property="og:description") or soup.find("meta", {"name": "description"})
         if description:
