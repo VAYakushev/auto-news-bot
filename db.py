@@ -1,4 +1,5 @@
 import sqlite3
+import os
 from config import DB_PATH
 
 
@@ -65,6 +66,35 @@ def mark_as_published(url: str, title: str, source: str):
         pass
     finally:
         conn.close()
+    
+    published_urls_path = "published_urls.txt"
+    try:
+        with open(published_urls_path, "a", encoding="utf-8") as f:
+            f.write(url + "\n")
+    except Exception:
+        pass
+
+
+def get_published_urls() -> set:
+    url_set = set()
+    
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT url FROM published_news")
+    for row in cursor.fetchall():
+        url_set.add(row[0])
+    conn.close()
+    
+    published_urls_path = "published_urls.txt"
+    if os.path.exists(published_urls_path):
+        try:
+            with open(published_urls_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    url_set.add(line.strip())
+        except Exception:
+            pass
+    
+    return url_set
 
 
 init_db()
