@@ -1,4 +1,7 @@
 import sqlite3
+import os
+import base64
+import requests
 from config import DB_PATH
 
 
@@ -16,6 +19,28 @@ def init_db():
     """)
     conn.commit()
     conn.close()
+
+
+def _push_db():
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if not token:
+        return
+    repo = os.environ.get("GITHUB_REPOSITORY", "VAYakushev/auto-news-bot")
+    try:
+        with open(DB_PATH, "rb") as f:
+            content = base64.b64encode(f.read()).decode()
+        r = requests.get(f"https://api.github.com/repos/{repo}/contents/{DB_PATH}",
+            headers={"Authorization": f"Bearer {token}"})
+        if r.status_code == 200:
+            sha = r.json()["sha"]
+            body = {"message": "Update news.db", "content": content, "sha": sha}
+        else:
+            body = {"message": "Add news.db", "content": content}
+        requests.put(f"https://api.github.com/repos/{repo}/contents/{DB_PATH}",
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+            json=body)
+    except Exception:
+        pass
 
 
 def is_already_published(url: str, title: str = "") -> bool:
@@ -65,6 +90,7 @@ def mark_as_published(url: str, title: str, source: str):
         pass
     finally:
         conn.close()
+    _push_db()
 
 
 init_db()
