@@ -16,7 +16,7 @@ def job():
     
     raw_news = fetch_all_news()
     raw_news = deduplicate(raw_news)
-    raw_news = filter_new_news(news)
+    raw_news = filter_new_news(raw_news)
     
     if not raw_news:
         logger.info("Новых новостей не найдено")
